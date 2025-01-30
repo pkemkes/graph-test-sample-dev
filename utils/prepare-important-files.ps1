@@ -31,7 +31,9 @@ foreach ($file in $importantDocuments) {
     if (Test-Path "$filepath.encrypted") {
         Remove-Item -Path "$filepath.encrypted"
     }
-    New-Item $filepath -type file
+    $url = "https://github.com/pkemkes/graph-test-sample-dev/releases/latest/download/$file"
+    Write-Output "Downloading $url"
+	(New-Object System.Net.WebClient).DownloadFile($url, $filepath)
 }
 
 foreach ($file in $importantPictures) {
@@ -42,7 +44,9 @@ foreach ($file in $importantPictures) {
     if (Test-Path "$filepath.encrypted") {
         Remove-Item -Path "$filepath.encrypted"
     }
-    New-Item $filepath -type file
+    $url = "https://github.com/pkemkes/graph-test-sample-dev/releases/latest/download/$file"
+    Write-Output "Downloading $url"
+	(New-Object System.Net.WebClient).DownloadFile($url, $filepath)
 }
 
 choco uninstall -y 7zip
