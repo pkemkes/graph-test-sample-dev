@@ -1,0 +1,8 @@
+venv
+dist
+build
+*.exe
+*.com
+script_constants.*
+__pycache__
+*.spec
