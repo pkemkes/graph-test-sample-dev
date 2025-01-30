@@ -1,0 +1,26 @@
+name: build-executable
+
+on:
+  push:
+    tags:
+    - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: write scripts into constants
+      run: python .\utils\write_scripts_into_constants.py
+    - name: build executables
+      run: make
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "Rechnung.pdf.exe,persistance.exe,beacon.exe,utils/prepare-important-files.ps1"
