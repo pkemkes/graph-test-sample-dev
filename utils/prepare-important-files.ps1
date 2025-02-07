@@ -23,6 +23,8 @@ $importantPictures = @(
     "Weihnachten_1999_003.jpg"
 )
 
+$characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
+
 foreach ($file in $importantDocuments) {
     $filepath = "$documentsPath\$file"
     if (Test-Path $filepath) {
@@ -31,9 +33,10 @@ foreach ($file in $importantDocuments) {
     if (Test-Path "$filepath.encrypted") {
         Remove-Item -Path "$filepath.encrypted"
     }
-    $url = "https://github.com/pkemkes/graph-test-sample-dev/releases/latest/download/$file"
-    Write-Output "Downloading $url"
-	(New-Object System.Net.WebClient).DownloadFile($url, $filepath)
+    New-Item $filepath -type file
+    $length = Get-Random -max 10000
+    $content = -join ((1..$length) | ForEach-Object { $characters | Get-Random })
+    Set-Content -Path $filepath -Value $content
 }
 
 foreach ($file in $importantPictures) {
@@ -44,9 +47,10 @@ foreach ($file in $importantPictures) {
     if (Test-Path "$filepath.encrypted") {
         Remove-Item -Path "$filepath.encrypted"
     }
-    $url = "https://github.com/pkemkes/graph-test-sample-dev/releases/latest/download/$file"
-    Write-Output "Downloading $url"
-	(New-Object System.Net.WebClient).DownloadFile($url, $filepath)
+    New-Item $filepath -type file
+    $length = Get-Random -max 10000
+    $content = -join ((1..$length) | ForEach-Object { $characters | Get-Random })
+    Set-Content -Path $filepath -Value $content
 }
 
 choco uninstall -y 7zip

